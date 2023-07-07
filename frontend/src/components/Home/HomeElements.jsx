@@ -19,9 +19,3 @@ export const HeroH1 = styled.h1`
   margin-bottom: 1rem;
   letter-spacing: 3px;
 `;
-
-export const RecentSearch = styled.div`
-  margin-top: 5rem;
-  text-align: center;
-  color: #fff;
-`;

@@ -1,0 +1,9 @@
+.container-result {
+  background-color: rgba(23, 32, 43, 1);
+  width: 646px;
+}
+@media screen and (max-width: 650px) {
+  .container-result {
+    width: 320px;
+  }
+}
