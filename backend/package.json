@@ -7,13 +7,19 @@
   "scripts": {
     "start": "nodemon index"
   },
-  "keywords": ["api", "openai", "food", "puppeteer"],
+  "keywords": [
+    "api",
+    "openai",
+    "food",
+    "puppeteer"
+  ],
   "author": "Varrel Tantio",
   "license": "ISC",
   "dependencies": {
+    "chrome-aws-lambda": "^10.1.0",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "nodemon": "^2.0.22",
-    "puppeteer": "^20.8.0"
+    "puppeteer-core": "^20.8.0"
   }
 }
