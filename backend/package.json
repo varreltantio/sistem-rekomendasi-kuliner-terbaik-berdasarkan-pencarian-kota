@@ -6,7 +6,7 @@
   "scripts": {
     "start": "nodemon index"
   },
-  "keywords": [],
+  "keywords": ["api", "openai", "food", "puppeteer"],
   "author": "Varrel Tantio",
   "license": "ISC",
   "dependencies": {

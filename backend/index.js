@@ -14,7 +14,7 @@ app.get("/", async (req, res) => {
 
 app.post('/', async (req, res) => {
   try {
-    const { place } = req.body;
+    const { city } = req.body;
 
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
@@ -23,7 +23,7 @@ app.post('/', async (req, res) => {
 
     await page.goto(urlFindFood);
 
-    const prompt = `Berikan daftar makanan khas ${place} dalam bentuk list dengan nomer dan tanpa penjelasan`;
+    const prompt = `Berikan daftar makanan khas ${city} dalam bentuk list dengan nomer dan tanpa penjelasan`;
 
     await page.evaluate((value) => {
       const textarea = document.querySelectorAll('.sectionChatFormInput')[0];
@@ -55,7 +55,7 @@ app.post('/', async (req, res) => {
 
     for (let i = 0; i < foods.length; i++) {
       let food = foods[i];
-      const searchQuery = `makanan ${food} ${place}`;
+      const searchQuery = `makanan ${food} ${city}`;
       const encodedSearchQuery = encodeURIComponent(searchQuery);
       const urlFindPlace = `https://www.google.com/maps/search/${encodedSearchQuery}`;
 
@@ -63,8 +63,8 @@ app.post('/', async (req, res) => {
 
       await page.waitForSelector('.kUPJ6b');
 
-      const result = await page.evaluate((food) => {
-        let placeName = '';
+      const result = await page.evaluate(() => {
+        let name = '';
         let rating = '';
         let srcImage = '';
 
@@ -72,7 +72,7 @@ app.post('/', async (req, res) => {
         const checkPlace2 = document.querySelectorAll('.DUwDvf')[0];
 
         if (checkPlace1 != undefined) {
-          placeName = checkPlace1.textContent;
+          name = checkPlace1.textContent;
 
           const checkRating = document.querySelectorAll('.MW4etd')[0];
 
@@ -89,7 +89,7 @@ app.post('/', async (req, res) => {
 
           }
         } else if (checkPlace2 != undefined) {
-          placeName = checkPlace2.textContent;
+          name = checkPlace2.textContent;
 
           const checkRating = document.querySelectorAll('.F7nice')[0];
 
@@ -107,7 +107,7 @@ app.post('/', async (req, res) => {
           }
         }
 
-        return { 'place name': placeName, 'rating': rating, 'image': srcImage };
+        return { 'name': name, 'rating': rating, 'image': srcImage };
       });
 
       places.push(result);
@@ -116,6 +116,7 @@ app.post('/', async (req, res) => {
     await browser.close();
 
     res.status(200).json({
+      city: city,
       foods: foods,
       places: places,
     });

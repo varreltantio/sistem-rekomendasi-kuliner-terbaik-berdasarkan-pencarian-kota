@@ -3,24 +3,16 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Stack from "react-bootstrap/Stack";
 import logoGo from "../../images/go.png";
-import { useState } from "react";
-import Category from "../Category/Category";
 import { useLocation } from "react-router-dom";
 
-const Search = () => {
+const Search = ({ setCity, searchFood }) => {
   const location = useLocation();
 
-  const [showResults, setShowResults] = useState(false);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setShowResults(true);
-  };
   return (
     <>
       <form
         className="mb-3 ms-4"
-        onSubmit={handleSubmit}
+        onSubmit={searchFood}
         style={{ position: "relative" }}
       >
         {/* When url in the Home */}
@@ -31,6 +23,7 @@ const Search = () => {
               aria-label="Search for a place..."
               aria-describedby="basic-addon2"
               id="inputSearch1"
+              onChange={(e) => setCity(e.target.value)}
             />
             <Button
               variant="outline-secondary"
@@ -55,6 +48,7 @@ const Search = () => {
               aria-label="Search for a place..."
               aria-describedby="basic-addon2"
               id="inputSearch2"
+              onChange={(e) => setCity(e.target.value)}
             />
             <Button
               variant="outline-secondary"
@@ -71,7 +65,6 @@ const Search = () => {
         )}
         {/* End Result */}
       </form>
-      {showResults ? <Category /> : null}
     </>
   );
 };

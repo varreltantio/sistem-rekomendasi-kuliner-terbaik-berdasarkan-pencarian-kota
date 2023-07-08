@@ -5,7 +5,7 @@ import "./Result.css";
 import ResultJumbotron from "../ResultJumbotron/ResultJumbotron";
 import ResultDetail from "../ResultDetail/ResultDetail";
 
-const Result = () => {
+const Result = ({ setCity, searchFood, data }) => {
   return (
     <>
       <Stack
@@ -14,13 +14,13 @@ const Result = () => {
         gap={2}
       >
         <ResultContent className="mx-auto mt-4">
-          <Search />
+          <Search setCity={setCity} searchFood={searchFood} />
           <p className="text-white text-center">
             Didn’t find what you were{" "}
             <span className="text-warning">looking</span> for?
           </p>
-          <ResultJumbotron />
-          <ResultDetail />
+          <ResultJumbotron data={data} />
+          <ResultDetail data={data} />
         </ResultContent>
       </Stack>
     </>

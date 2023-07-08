@@ -1,26 +1,51 @@
 import React, { useState } from "react";
 import NavbarCustom from "../NavbarCustom/NavbarCustom";
 import { HeroContainer } from "./HeroElements";
-import Sidebar from "../Sidebar/Sidebar";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Home from "../Home/Home";
 import Result from "../Result/Result";
+import axios from "axios";
 
 const Hero = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [city, setCity] = useState("");
+  const [data, setData] = useState({city: "", foods: [], places: []});
+  const [isLoading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const toggle = () => {
-    setIsOpen(!isOpen);
+  const navigate = useNavigate();
+
+  const searchFood = async (event) => {
+    event.preventDefault();
+    setLoading(true);
+    setError("");
+
+    await axios
+      .post(process.env.REACT_APP_BACKEND_URL, {
+        city,
+      })
+      .then((response) => {
+        setData(response.data);
+        navigate("/result");
+      })
+      .catch((error) => setError(error.message));
+
+    setLoading(false);
   };
 
   const location = useLocation();
 
   return (
     <HeroContainer>
-      <NavbarCustom toggle={toggle} />
-      <Sidebar isOpen={isOpen} toggle={toggle} />
-      {location.pathname === "/" && <Home />}
-      {location.pathname === "/result" && <Result />}
+      {isLoading && (
+        <div className="loader">
+          <div className="spinner"></div>
+        </div>
+      )} 
+
+      <NavbarCustom />
+
+      {location.pathname === "/" && <Home setCity={setCity} searchFood={searchFood} error={error} />}
+      {location.pathname === "/result" && <Result setCity={setCity} searchFood={searchFood} data={data} />}
     </HeroContainer>
   );
 };

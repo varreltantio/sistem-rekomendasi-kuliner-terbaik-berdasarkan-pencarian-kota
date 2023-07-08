@@ -3,14 +3,14 @@ import { Bars, Nav, NavIcon, NavLink } from "./NavbarCustomElements";
 import Image from "react-bootstrap/Image";
 import bgImage from "../../images/logo.png";
 
-function NavbarCustom({ toggle }) {
+function NavbarCustom() {
   return (
     <>
       <Nav>
         <NavLink to="/">
           <Image src={bgImage} rounded />
         </NavLink>
-        <NavIcon onClick={toggle}>
+        <NavIcon>
           <Bars />
         </NavIcon>
       </Nav>

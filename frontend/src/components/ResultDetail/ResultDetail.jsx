@@ -4,79 +4,58 @@ import image from "../../images/image.png";
 import Stack from "react-bootstrap/Stack";
 import { ResultImage, ResultItem, VerticalLine } from "./ResultDetailElements";
 
-const ResultDetail = () => {
+const ResultDetail = ({ data }) => {
   return (
     <>
-      {/* Loop Result Category */}
-      <Stack direction="horizontal" className="mt-3">
-        <img src={sun} alt="Logo GO" />
-        <div className="p-2 fw-bold text-warning">MORNING</div>
-      </Stack>
-      <VerticalLine>
-        {/* Loop Result */}
-        {/* Data 1 */}
-        <div className="ps-3">
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt utet dolore magna aliqua. Ut enim ad minim
-            veniam.
-          </p>
-          <ResultImage className="mb-5">
-            <img src={image} alt="image1" id="imageResult" />
-            <ResultItem className="text-white">
-              <p className="mb-1">Kekel Aba Rafi</p>
-              <Stack direction="horizontal">
-                <img src={star} alt="Logo GO" />
-                <div className="p-2 fw-bold">4.7</div>
+      {data.foods.length > 0 ? (
+        data.foods.map((food, index) => {
+          if (!data.places[index].name) {
+            return null;
+          }
+
+          return (
+            <div key={index}>
+              <Stack direction="horizontal" className="mt-3" >
+                <img src={sun} alt={`image ${food}`} />
+                <div className="p-2 fw-bold text-warning">{food}</div>
               </Stack>
-            </ResultItem>
-          </ResultImage>
-        </div>
-        {/* Data 2 */}
-        <div className="ps-3">
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt utet dolore magna aliqua. Ut enim ad minim
-            veniam.
-          </p>
-          <ResultImage className="mb-5">
-            <img src={image} alt="image2" id="imageResult" />
-            <ResultItem className="text-white">
-              <p className="mb-1">Kekel Aba Rafi</p>
-              <Stack direction="horizontal">
-                <img src={star} alt="Logo GO" />
-                <div className="p-2 fw-bold">4.7</div>
-              </Stack>
-            </ResultItem>
-          </ResultImage>
-        </div>
-        {/* End Loop Result */}
-      </VerticalLine>
-      <Stack direction="horizontal" className="mt-3">
-        <img src={sun} alt="Logo GO" />
-        <div className="p-2 fw-bold text-warning">AFTERNOON</div>
-      </Stack>
-      <VerticalLine>
-        {/* Loop Result */}
-        <div className="ps-3">
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt utet dolore magna aliqua. Ut enim ad minim
-            veniam.
-          </p>
-          <ResultImage className="mb-5">
-            <img src={image} alt="image3" id="imageResult" />
-            <ResultItem className="text-white">
-              <p className="mb-1">Kekel Aba Rafi</p>
-              <Stack direction="horizontal">
-                <img src={star} alt="Logo GO" />
-                <div className="p-2 fw-bold">4.7</div>
-              </Stack>
-            </ResultItem>
-          </ResultImage>
-        </div>
-        {/* End Loop Result */}
-      </VerticalLine>
+              <VerticalLine>
+                <div className="ps-3">
+                  <ResultImage className="mb-5">
+                    <img
+                      src={data.places[index].image ? data.places[index].image : image}
+                      alt={`image${index}`}
+                      id="imageResult"
+                      style={{
+                        transform: 'scale(1.2)',
+                        width: '300px',
+                        height: '150px',
+                        marginTop: '20px',
+                        marginLeft: '30px',
+                      }}
+                    />
+
+                    <ResultItem className="text-white">
+                      <p className="mb-1" style={{ textShadow: '2px 2px 4px black' }}>
+                        {data.places[index].name}
+                      </p>
+                      <Stack direction="horizontal">
+                        <img src={star} alt={`image ${data.places[index].name}}`} />
+                        <div className="p-2 fw-bold" style={{ textShadow: '2px 2px 4px black' }}>
+                          Rating: {data.places[index].rating}
+                        </div>
+                      </Stack>
+                    </ResultItem>
+                  </ResultImage>
+                </div>
+              </VerticalLine>
+            </div>
+          );
+        })
+      ) : (
+        <p style={{ color: 'white', textAlign: 'center', marginTop: '50px' }}>Tidak ada data yang tersedia.</p>
+      )}
+
     </>
   );
 };
