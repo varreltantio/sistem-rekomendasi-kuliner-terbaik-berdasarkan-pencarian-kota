@@ -24,7 +24,6 @@ app.post('/', async (req, res) => {
     const browser = await puppeteer.launch({
       executablePath,
       args: edgeChromium.args,
-      headless: false,
     })
 
     const page = await browser.newPage();
