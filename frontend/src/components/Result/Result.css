@@ -6,4 +6,7 @@
   .container-result {
     width: 320px;
   }
+  img#imageResult {
+    width: 250px;
+  }
 }
