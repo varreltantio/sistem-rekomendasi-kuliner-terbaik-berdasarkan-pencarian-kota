@@ -44,7 +44,7 @@ app.post('/', async (req, res) => {
       submitButton.click();
     });
 
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
     // Wait for the messageContain element to appear
     await page.waitForSelector('.messageContain');
@@ -55,7 +55,7 @@ app.post('/', async (req, res) => {
 
       const listItems = Array.from(list.querySelectorAll('li'))
         .map((li) => li.innerText)
-        .slice(0, 3);
+        .slice(0, 2);
 
       return listItems;
     });
