@@ -1,6 +1,6 @@
-const express = require("express");
-const cors = require("cors");
-const puppeteer = require('puppeteer');
+import express from "express";
+import cors from "cors";
+import puppeteer from "puppeteer";
 
 const app = express();
 app.use(cors());
@@ -127,8 +127,6 @@ app.post('/', async (req, res) => {
 });
 
 const PORT = 5000;
-
-module.exports = app;
 
 app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);

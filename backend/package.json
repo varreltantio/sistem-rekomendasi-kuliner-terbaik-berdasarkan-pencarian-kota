@@ -1,8 +1,9 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "API for Discover the Best Food in Every City",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "nodemon index"
   },
