@@ -128,8 +128,8 @@ app.post('/', async (req, res) => {
 
 const PORT = 5000;
 
+module.exports = app;
+
 app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
 });
-
-module.exports = app;
