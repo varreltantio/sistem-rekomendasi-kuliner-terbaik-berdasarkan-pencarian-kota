@@ -1,24 +1,23 @@
 import express from "express";
+import * as dotenv from "dotenv";
 import cors from "cors";
-import edgeChromium from 'chrome-aws-lambda'
-import puppeteer from 'puppeteer-core'
+import { Configuration, OpenAIApi } from "openai";
+import { Client } from "@googlemaps/google-maps-services-js";
+
+
+dotenv.config();
+
+const configuration = new Configuration({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+const openai = new OpenAIApi(configuration);
 
 const app = express();
-const corsOptions = {
-  origin: "*",
-  credentials: true,
-  optionSuccessStatus: 200,
-};
-
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(express.json());
-app.use(
-  express.urlencoded({
-    extended: true,
-  })
-);
 
-const LOCAL_CHROME_EXECUTABLE = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+const client = new Client({});
 
 app.get("/", async (req, res) => {
   res.status(200).send({
@@ -30,116 +29,74 @@ app.post('/', async (req, res) => {
   try {
     const { city } = req.body;
 
-    const executablePath = await edgeChromium.executablePath || LOCAL_CHROME_EXECUTABLE
+    const prompt = `Berikan 5 daftar makanan khas ${city}`;
 
-    const browser = await puppeteer.launch({
-      executablePath,
-      args: edgeChromium.args,
-    })
-
-    const page = await browser.newPage();
-
-    const urlFindFood = 'https://talkai.info/chat/';
-
-    await page.goto(urlFindFood);
-
-    const prompt = `Berikan daftar makanan khas ${city} dalam bentuk list dengan nomer dan tanpa penjelasan`;
-
-    await page.evaluate((value) => {
-      const textarea = document.querySelectorAll('.sectionChatFormInput')[0];
-      textarea.value = value;
-    }, prompt);
-
-    await page.evaluate(() => {
-      const submitButton = document.querySelectorAll('.sectionChatFormButton')[0];
-      submitButton.click();
+    const response = await openai.createCompletion({
+      model: "text-davinci-003",
+      prompt: `${prompt}`,
+      temperature: 0,
+      max_tokens: 3000,
+      top_p: 1,
+      frequency_penalty: 0.5,
+      presence_penalty: 0,
     });
+    const text = response.data.choices[0].text;
 
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    const lines = text.split("\n");
 
-    // Wait for the messageContain element to appear
-    await page.waitForSelector('.messageContain');
+    const foods = [];
 
-    const foods = await page.evaluate(() => {
-      const result = document.querySelectorAll('.messageContain')[2];
-      const list = result.querySelectorAll('ol')[0];
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
 
-      const listItems = Array.from(list.querySelectorAll('li'))
-        .map((li) => li.innerText)
-        .slice(0, 2);
-
-      return listItems;
-    });
-
-    const places = [];
-
-    for (let i = 0; i < foods.length; i++) {
-      let food = foods[i];
-      const searchQuery = `makanan ${food} ${city}`;
-      const encodedSearchQuery = encodeURIComponent(searchQuery);
-      const urlFindPlace = `https://www.google.com/maps/search/${encodedSearchQuery}`;
-
-      await page.goto(urlFindPlace);
-
-      await page.waitForSelector('.kUPJ6b');
-
-      const result = await page.evaluate(() => {
-        let name = '';
-        let rating = '';
-        let srcImage = '';
-
-        const checkPlace1 = document.querySelectorAll('.qBF1Pd')[0];
-        const checkPlace2 = document.querySelectorAll('.DUwDvf')[0];
-
-        if (checkPlace1 != undefined) {
-          name = checkPlace1.textContent;
-
-          const checkRating = document.querySelectorAll('.MW4etd')[0];
-
-          if (checkRating != undefined) {
-            rating = checkRating.textContent;
-          }
-
-          const checkImage = document.querySelectorAll('.p0Hhde')[0];
-
-          if (checkImage != undefined) {
-            const divImage = checkImage;
-            const image = divImage.querySelector('img');
-            srcImage = image.getAttribute('src');
-
-          }
-        } else if (checkPlace2 != undefined) {
-          name = checkPlace2.textContent;
-
-          const checkRating = document.querySelectorAll('.F7nice')[0];
-
-          if (checkRating != undefined) {
-            rating = checkRating.querySelector('span').textContent;
-          }
-
-          const checkImage = document.querySelectorAll('.aoRNLd')[0];
-
-          if (checkImage != undefined) {
-            const image = checkImage.querySelector('img');
-            if (image) {
-              srcImage = image.getAttribute('src');
-            }
-          }
-        }
-
-        return { 'name': name, 'rating': rating, 'image': srcImage };
-      });
-
-      places.push(result);
+      if (line !== "") {
+        const food = line;
+        foods.push(food);
+      }
     }
 
-    await browser.close();
-
-    res.status(200).send({
-      city: city,
-      foods: foods,
-      places: places,
+    const promises = foods.map(food => {
+      return client.findPlaceFromText({
+        params: {
+          input: food,
+          inputtype: "textquery",
+          fields: ["name", "photos", "rating", "formatted_address"],
+          key: process.env.GOOGLE_MAPS_API_KEY,
+        },
+        timeout: 1000, // milliseconds
+      })
     });
+
+    Promise.all(promises)
+      .then(responses => {
+        const places = [];
+
+        responses.forEach(response => {
+          const results = response.data.candidates;
+          results.forEach(place => {
+            places.push({
+              name: place.name,
+              rating: place.rating,
+              formattedAddress: place.formatted_address,
+              image: place.photos && place.photos.length > 0
+                ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${place.photos[0].photo_reference}&key=${process.env.GOOGLE_MAPS_API_KEY}`
+                : null
+            });
+          });
+        });
+
+        const data = {
+          city: city,
+          foods: foods,
+          places: places
+        };
+
+        res.status(200).send(data);
+      })
+      .catch(error => {
+        console.log(error.response.data.error_message);
+        res.status(500).send("Error occurred");
+      });
   } catch (error) {
     console.error(error);
     res.status(500).send("Something went wrong");

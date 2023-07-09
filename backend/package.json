@@ -19,10 +19,11 @@
   "author": "Varrel Tantio",
   "license": "ISC",
   "dependencies": {
-    "chrome-aws-lambda": "^10.1.0",
+    "@googlemaps/google-maps-services-js": "^3.3.32",
     "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "nodemon": "^2.0.22",
-    "puppeteer-core": "^10.1.0"
+    "openai": "^3.3.0"
   }
 }

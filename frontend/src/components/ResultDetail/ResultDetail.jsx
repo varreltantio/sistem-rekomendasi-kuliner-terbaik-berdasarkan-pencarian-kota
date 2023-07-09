@@ -9,7 +9,7 @@ const ResultDetail = ({ data }) => {
     <>
       {data.foods.length > 0 ? (
         data.foods.map((food, index) => {
-          if (!data.places[index].name) {
+          if (!data.places[index]) {
             return null;
           }
 
@@ -21,6 +21,7 @@ const ResultDetail = ({ data }) => {
               </Stack>
               <VerticalLine>
                 <div className="ps-3">
+                  <p>Alamat: {data.places[index].formattedAddress}</p>
                   <ResultImage className="mb-5">
                     <img
                       src={data.places[index].image ? data.places[index].image : image}
